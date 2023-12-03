@@ -6,63 +6,62 @@ fn main() {
     println!("{result}");
 }
 
-fn get_int_from_string(str: &str) -> Option<u32>{
-    let mut number_string:String = String::new();
-    for char in str.chars(){
-        if char.is_digit(10){
+fn get_int_from_string(str: &str) -> Option<u32> {
+    let mut number_string: String = String::new();
+    for char in str.chars() {
+        if char.is_digit(10) {
             number_string.push(char);
         }
     }
-    if !number_string.is_empty(){
+    if !number_string.is_empty() {
         return Some(number_string.parse::<u32>().unwrap());
     }
     None
 }
 
-fn check_if_valid_game(str:&str, red:u32, green:u32, blue:u32) -> bool{
-    for cubes in str.split(","){
-        
-        if let Some(num_cubes) = get_int_from_string(cubes){
+fn check_if_valid_game(str: &str, red: u32, green: u32, blue: u32) -> bool {
+    for cubes in str.split(",") {
+        if let Some(num_cubes) = get_int_from_string(cubes) {
             if cubes.contains("blue") {
                 if num_cubes > blue {
-                    return  false;
-                } 
+                    return false;
+                }
             }
             if cubes.contains("red") {
                 if num_cubes > red {
-                    return  false;
-                } 
+                    return false;
+                }
             }
             if cubes.contains("green") {
                 if num_cubes > green {
-                    return  false;
-                } 
+                    return false;
+                }
             }
         }
     }
     true
 }
 
-fn parse_input(str: &str) -> u32{
+fn parse_input(str: &str) -> u32 {
     let mut result = 0;
-    for line in str.lines(){
+    for line in str.lines() {
         let mut split = line.split(":");
-        let mut game_value:u32 = 0;
-        if let Some(game) = split.next(){
+        let mut game_value: u32 = 0;
+        if let Some(game) = split.next() {
             if let Some(value) = get_int_from_string(game) {
                 game_value = value;
             }
         }
         let mut valid = true;
-        if let Some(split_games) = split.next(){
-            for games in split_games.split(";"){
-                if !check_if_valid_game(games, 12, 13, 14){
+        if let Some(split_games) = split.next() {
+            for games in split_games.split(";") {
+                if !check_if_valid_game(games, 12, 13, 14) {
                     println!("Not VALID: {games}");
                     valid = false;
                 }
             }
         }
-        if valid{
+        if valid {
             result += game_value;
         }
     }
@@ -107,6 +106,4 @@ mod tests {
         let input = "19 green";
         assert_eq!(get_int_from_string(input), Some(19));
     }
-
-    
 }

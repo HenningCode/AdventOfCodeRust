@@ -1,4 +1,4 @@
-use std::{fs,cmp};
+use std::{cmp, fs};
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Not a valid file");
@@ -6,24 +6,23 @@ fn main() {
     println!("{result}");
 }
 
-fn get_int_from_string(str: &str) -> Option<u32>{
-    let mut number_string:String = String::new();
-    for char in str.chars(){
-        if char.is_digit(10){
+fn get_int_from_string(str: &str) -> Option<u32> {
+    let mut number_string: String = String::new();
+    for char in str.chars() {
+        if char.is_digit(10) {
             number_string.push(char);
         }
     }
-    if !number_string.is_empty(){
+    if !number_string.is_empty() {
         return Some(number_string.parse::<u32>().unwrap());
     }
     None
 }
 
-fn get_values_from_game(str: &str) ->(u32,u32,u32){
-    let (mut red, mut green, mut blue) = (0,0,0);
-    for cubes in str.split(","){
-        
-        if let Some(num_cubes) = get_int_from_string(cubes){
+fn get_values_from_game(str: &str) -> (u32, u32, u32) {
+    let (mut red, mut green, mut blue) = (0, 0, 0);
+    for cubes in str.split(",") {
+        if let Some(num_cubes) = get_int_from_string(cubes) {
             if cubes.contains("blue") {
                 blue = num_cubes;
             }
@@ -38,20 +37,20 @@ fn get_values_from_game(str: &str) ->(u32,u32,u32){
     (red, green, blue)
 }
 
-fn parse_input(str: &str) -> u32{
+fn parse_input(str: &str) -> u32 {
     let mut result = 0;
-    for line in str.lines(){
+    for line in str.lines() {
         let mut split = line.split(":");
         split.next();
-        if let Some(split_games) = split.next(){
-            let (mut red, mut green, mut blue) = (0,0,0);
-            for game in split_games.split(";"){
-                let (new_red,new_green, new_blue) = get_values_from_game(game);
+        if let Some(split_games) = split.next() {
+            let (mut red, mut green, mut blue) = (0, 0, 0);
+            for game in split_games.split(";") {
+                let (new_red, new_green, new_blue) = get_values_from_game(game);
                 red = cmp::max(new_red, red);
                 green = cmp::max(new_green, green);
                 blue = cmp::max(new_blue, blue);
             }
-            result += red*green*blue;
+            result += red * green * blue;
         }
     }
     result
@@ -99,7 +98,7 @@ mod tests {
     #[test]
     fn test_input_95() {
         let input = "Game 95: 3 blue, 13 red, 10 green; 4 green, 17 blue, 12 red; 12 red, 10 green, 16 blue; 15 red, 14 green, 2 blue; 12 red, 1 blue, 15 green; 10 green, 13 blue, 19 red";
-        assert_eq!(parse_input(input), 4845); 
+        assert_eq!(parse_input(input), 4845);
         // red green blue
         // 19 15 17
     }
@@ -127,6 +126,4 @@ mod tests {
         let input = "19 green";
         assert_eq!(get_int_from_string(input), Some(19));
     }
-
-    
 }
