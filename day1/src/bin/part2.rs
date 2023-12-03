@@ -68,7 +68,7 @@ fn parse_input(input: String) -> i32 {
         let mut value2: i32 = 0;
 
         if let Some(result) = find.first() {
-            let index = offset.first().unwrap() + result.start() as i32;
+            let index = result.start() as i32;
             if let Some(position_int) = position_int_vec.first() {
                 if *position_int > index {
                     value1 = match_string_to_number(result.as_str());
