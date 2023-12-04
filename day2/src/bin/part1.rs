@@ -9,33 +9,24 @@ fn main() {
 fn get_int_from_string(str: &str) -> Option<u32> {
     let mut number_string: String = String::new();
     for char in str.chars() {
-        if char.is_digit(10) {
+        if char.is_ascii_digit() {
             number_string.push(char);
         }
     }
-    if !number_string.is_empty() {
-        return Some(number_string.parse::<u32>().unwrap());
-    }
-    None
+    number_string.parse().ok()
 }
 
 fn check_if_valid_game(str: &str, red: u32, green: u32, blue: u32) -> bool {
-    for cubes in str.split(",") {
+    for cubes in str.split(',') {
         if let Some(num_cubes) = get_int_from_string(cubes) {
-            if cubes.contains("blue") {
-                if num_cubes > blue {
+            if cubes.contains("blue") && num_cubes > blue {
                     return false;
-                }
             }
-            if cubes.contains("red") {
-                if num_cubes > red {
+            if cubes.contains("red") && num_cubes > red {
                     return false;
-                }
             }
-            if cubes.contains("green") {
-                if num_cubes > green {
+            if cubes.contains("green") && num_cubes > green {
                     return false;
-                }
             }
         }
     }
@@ -45,7 +36,7 @@ fn check_if_valid_game(str: &str, red: u32, green: u32, blue: u32) -> bool {
 fn parse_input(str: &str) -> u32 {
     let mut result = 0;
     for line in str.lines() {
-        let mut split = line.split(":");
+        let mut split = line.split(':');
         let mut game_value: u32 = 0;
         if let Some(game) = split.next() {
             if let Some(value) = get_int_from_string(game) {
@@ -54,9 +45,8 @@ fn parse_input(str: &str) -> u32 {
         }
         let mut valid = true;
         if let Some(split_games) = split.next() {
-            for games in split_games.split(";") {
+            for games in split_games.split(';') {
                 if !check_if_valid_game(games, 12, 13, 14) {
-                    println!("Not VALID: {games}");
                     valid = false;
                 }
             }
@@ -105,5 +95,11 @@ mod tests {
     fn test5() {
         let input = "19 green";
         assert_eq!(get_int_from_string(input), Some(19));
+    }
+
+    #[test]
+    fn test6() {
+        let input = "Test";
+        assert_eq!(get_int_from_string(input), None);
     }
 }

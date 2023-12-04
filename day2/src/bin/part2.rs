@@ -1,4 +1,4 @@
-use std::{cmp, fs};
+use std::fs;
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Not a valid file");
@@ -9,19 +9,16 @@ fn main() {
 fn get_int_from_string(str: &str) -> Option<u32> {
     let mut number_string: String = String::new();
     for char in str.chars() {
-        if char.is_digit(10) {
+        if char.is_ascii_digit() {
             number_string.push(char);
         }
     }
-    if !number_string.is_empty() {
-        return Some(number_string.parse::<u32>().unwrap());
-    }
-    None
+    number_string.parse().ok()
 }
 
 fn get_values_from_game(str: &str) -> (u32, u32, u32) {
     let (mut red, mut green, mut blue) = (0, 0, 0);
-    for cubes in str.split(",") {
+    for cubes in str.split(',') {
         if let Some(num_cubes) = get_int_from_string(cubes) {
             if cubes.contains("blue") {
                 blue = num_cubes;
@@ -40,15 +37,15 @@ fn get_values_from_game(str: &str) -> (u32, u32, u32) {
 fn parse_input(str: &str) -> u32 {
     let mut result = 0;
     for line in str.lines() {
-        let mut split = line.split(":");
+        let mut split = line.split(':');
         split.next();
         if let Some(split_games) = split.next() {
             let (mut red, mut green, mut blue) = (0, 0, 0);
-            for game in split_games.split(";") {
+            for game in split_games.split(';') {
                 let (new_red, new_green, new_blue) = get_values_from_game(game);
-                red = cmp::max(new_red, red);
-                green = cmp::max(new_green, green);
-                blue = cmp::max(new_blue, blue);
+                red = red.max(new_red);
+                green = green.max(new_green);
+                blue = blue.max(new_blue);
             }
             result += red * green * blue;
         }
