@@ -74,7 +74,6 @@ fn symbols_around(
     if current_line_index == 0 {
         // first line only row below nessacary
         around |= row_above_below(current_char_index, number_len, &lines[1]);
-
     } else if current_line_index == lines.len() - 1 {
         // last line only row above nessacary
         around |= row_above_below(
@@ -82,7 +81,6 @@ fn symbols_around(
             number_len,
             &lines[current_line_index - 1],
         );
-        
     } else {
         // All line inbetween
         // this is row below
