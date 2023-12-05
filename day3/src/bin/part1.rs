@@ -68,10 +68,13 @@ fn symbols_around(
     lines: &Vec<String>,
 ) -> bool {
     let mut around = false;
+
     around |= same_row(current_char_index, number_len, &lines[current_line_index]);
+
     if current_line_index == 0 {
         // first line only row below nessacary
         around |= row_above_below(current_char_index, number_len, &lines[1]);
+
     } else if current_line_index == lines.len() - 1 {
         // last line only row above nessacary
         around |= row_above_below(
@@ -79,6 +82,7 @@ fn symbols_around(
             number_len,
             &lines[current_line_index - 1],
         );
+        
     } else {
         // All line inbetween
         // this is row below
@@ -98,12 +102,12 @@ fn symbols_around(
 }
 
 fn parse_input(str: &str) -> u32 {
-    let lines: Vec<String> = str.lines().map(|x| String::from(x)).collect();
+    let lines: Vec<String> = str.lines().map(String::from).collect();
     let mut result: u32 = 0;
     let mut current_number: Vec<char> = Vec::new();
 
     for (i, line) in lines.clone().into_iter().enumerate() {
-        for (j, char) in line.chars().into_iter().enumerate() {
+        for (j, char) in line.chars().enumerate() {
             if char.is_ascii_digit() {
                 current_number.push(char);
             }
