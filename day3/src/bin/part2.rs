@@ -86,7 +86,7 @@ fn same_row(current_char_index: usize, line: &str) -> Vec<u32> {
 
     // check right of the gear
     if line.chars().nth(left_index).unwrap().is_ascii_digit() {
-        if let Some(num) = get_numbers_from_range(right_index, left_index, line) {
+        if let Some(num) = get_numbers_from_range(left_index, right_index, line) {
             numbers.push(num);
         }
     }
