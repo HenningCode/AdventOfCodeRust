@@ -17,16 +17,9 @@ fn get_numbers_into_vec(input: &str) -> Vec<u32> {
 }
 
 fn parse_input(input: &str) -> u32 {
-    let mut num_scratchcards = vec![
-        1;
-        input
-            .lines()
-            .map(String::from)
-            .collect::<Vec<String>>()
-            .len()
-    ];
-    for (i, line) in input.lines().enumerate() {
-        let mut right = 0;
+    let mut result = 0;
+    for line in input.lines() {
+        let mut right: u32 = 0;
         let mut split = line.split(':');
         split.next();
         if let Some(card) = split.next() {
@@ -40,16 +33,17 @@ fn parse_input(input: &str) -> u32 {
                             right += 1;
                         }
                     }
-                    if right > 0 {
-                        for j in 1..=right {
-                            num_scratchcards[i + j] += num_scratchcards[i];
-                        }
-                    }
                 }
             }
         }
+
+        let base: u32 = 2;
+        if right > 0 {
+            result += base.pow(right.saturating_sub(1));
+        }
     }
-    num_scratchcards.iter().sum()
+
+    result
 }
 
 #[cfg(test)]
@@ -65,6 +59,6 @@ Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
 Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
 Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
 
-        assert_eq!(parse_input(input), 30);
+        assert_eq!(parse_input(input), 13);
     }
 }
