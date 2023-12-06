@@ -6,23 +6,59 @@ fn main() {
     println!("{result}");
 }
 
-fn get_number_from_range(i: usize, j: usize, line: &String) -> Option<u32> {
-    if i == j {
+fn get_numbers_from_range(start: usize, end: usize, line: &str) -> Option<u32> {
+    if start == end {
         return None;
     }
 
     let mut num: String = String::new();
-    for k in i..=j {
-        let char = line.chars().nth(k).unwrap();
-        if char.is_ascii_digit() {
+    if start < end {
+        // *123 if the first char to the right is not a digit its not connected to the gear anymore
+        for k in start..=end {
+            let char = line.chars().nth(k).unwrap();
+            if !char.is_ascii_digit() {
+                break;
+            }
             num.push(char);
+        }
+    } else {
+        // 123*
+        for k in (end..=start).rev() {
+            let char = line.chars().nth(k).unwrap();
+            if !char.is_ascii_digit() {
+                break;
+            }
+            // insert to the front to get the number in the right order
+            num.insert(0, char);
         }
     }
 
     num.parse().ok()
 }
 
-fn same_row(current_char_index: usize, line: &String) -> Vec<u32> {
+fn get_single_number_from_range(start: usize, end: usize, line: &str) -> Option<u32> {
+    if start == end {
+        return None;
+    }
+    let mut found = false;
+    let mut num: String = String::new();
+    for k in start..=end {
+        let char = line.chars().nth(k).unwrap();
+        if char.is_ascii_digit() {
+            num.push(char);
+            found = true;
+        } else if found && !char.is_ascii_digit() && num.len() == 1 {
+            num.clear();
+            found = false;
+        } else if found && !char.is_ascii_digit() && num.len() > 1 {
+            break;
+        }
+    }
+
+    num.parse().ok()
+}
+
+fn same_row(current_char_index: usize, line: &str) -> Vec<u32> {
     let line_len_index = line.len() - 1;
     let mut numbers: Vec<u32> = Vec::new();
 
@@ -33,7 +69,7 @@ fn same_row(current_char_index: usize, line: &String) -> Vec<u32> {
 
     // first check left of the gear
     if line.chars().nth(right_index).unwrap().is_ascii_digit() {
-        if let Some(num) = get_number_from_range(left_index, right_index, &line) {
+        if let Some(num) = get_numbers_from_range(right_index, left_index, line) {
             numbers.push(num);
         }
     }
@@ -50,14 +86,14 @@ fn same_row(current_char_index: usize, line: &String) -> Vec<u32> {
 
     // check right of the gear
     if line.chars().nth(left_index).unwrap().is_ascii_digit() {
-        if let Some(num) = get_number_from_range(left_index, right_index, &line) {
+        if let Some(num) = get_numbers_from_range(right_index, left_index, line) {
             numbers.push(num);
         }
     }
     numbers
 }
 
-fn row_above_below(current_char_index: usize, line: &String) -> Vec<u32> {
+fn row_above_below(current_char_index: usize, line: &str) -> Vec<u32> {
     let line_len_index = line.len() - 1;
     let mut numbers: Vec<u32> = Vec::new();
 
@@ -69,45 +105,39 @@ fn row_above_below(current_char_index: usize, line: &String) -> Vec<u32> {
         .unwrap()
         .is_ascii_digit()
     {
-        let left_index = current_char_index.saturating_sub(1);
-        let right_index = line_len_index.min(current_char_index + 1);
-        
-        if let Some(num) = get_number_from_range(left_index, right_index, line) {
+        let left_index = current_char_index.saturating_sub(2);
+        let right_index = line_len_index.min(current_char_index + 2);
+
+        if let Some(num) = get_single_number_from_range(left_index, right_index, line) {
             numbers.push(num);
         }
-        
     } else {
-        // TODO just check left and right for a number.
-        
-    }
+        // check right side gear
+        let left_index = line_len_index.min(current_char_index + 1);
+        let right_index = line_len_index.min(current_char_index + 3);
 
-    let left_start_index = current_char_index.saturating_sub(1);
-    if line.chars().nth(left_start_index).unwrap().is_ascii_digit() {
-        return numbers;
-    }
+        if let Some(num) = get_numbers_from_range(left_index, right_index, line) {
+            numbers.push(num);
+        }
 
-    let left_index = current_char_index;
-    let right_index = line_len_index.min(current_char_index + 3);
+        // check left side of the gear
+        let left_index = current_char_index.saturating_sub(3);
+        let right_index = current_char_index.saturating_sub(1);
 
-    if line
-        .chars()
-        .nth(left_start_index + 1)
-        .unwrap()
-        .is_ascii_digit()
-    {
-        if let Some(num) = get_number_from_range(left_index, right_index, &line) {
+        if let Some(num) = get_numbers_from_range(right_index, left_index, line) {
             numbers.push(num);
         }
     }
-
     numbers
 }
 
 fn unpack_into_tuple(numbers: &Vec<u32>) -> Option<(u32, u32)> {
     if numbers.len() == 2 {
         return Some((numbers[0], numbers[1]));
+    } else {
+        println!("{:?}", numbers);
     }
-    return None;
+    None
 }
 
 fn numbers_around(
@@ -162,6 +192,7 @@ fn parse_input(str: &str) -> u32 {
             // gear found
             if char == '*' {
                 if let Some((num1, num2)) = numbers_around(j, i, &lines) {
+                    println!("{num1}, {num2}");
                     result += num1 * num2;
                 }
             }
@@ -209,16 +240,8 @@ mod tests {
 
     #[test]
     fn check_same_line() {
-        let input = "467..114..
-...*......
-..35..633.
-......#...
-617*112...
-.....+..58
-5.592.....
-......755.
-...$.*....
-.664.598..";
+        let input = "..2.53*...
+..........";
         let result = parse_input(input);
         assert_eq!(result, 4361);
     }
