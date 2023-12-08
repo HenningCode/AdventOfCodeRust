@@ -5,6 +5,7 @@ fn main() {
     let result = parse_input(&input);
     println!("{result}");
 }
+
 fn get_numbers_into_vec(input: &str) -> Vec<u32> {
     let mut number_vec: Vec<u32> = Vec::new();
 
