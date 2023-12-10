@@ -7,14 +7,14 @@ fn main() {
 }
 
 fn parse_input(input: &str) -> u32 {
-    let(mut instructions, mut map) = ("", "");
-    
+    let (mut instructions, mut map) = ("", "");
+
     if let Some((temp1, temp2)) = input.split_once("\n\n") {
-        (instructions, map) = (temp1,temp2);
+        (instructions, map) = (temp1, temp2);
     } else if let Some((temp1, temp2)) = input.split_once("\r\n\r\n") {
-        (instructions, map) = (temp1,temp2);
+        (instructions, map) = (temp1, temp2);
     }
-       
+
     let instructions_vec: Vec<char> = instructions.chars().collect();
 
     let mut hash_map = HashMap::new();
@@ -32,7 +32,6 @@ fn parse_input(input: &str) -> u32 {
     let start = "AAA";
     let (mut left, mut right) = hash_map.get(start).unwrap().clone();
     loop {
-        
         let current_instruction = instructions_vec[i % len];
 
         match current_instruction {
@@ -55,7 +54,6 @@ fn parse_input(input: &str) -> u32 {
 
     (i as u32) + 1
 }
-
 
 #[cfg(test)]
 mod tests {
