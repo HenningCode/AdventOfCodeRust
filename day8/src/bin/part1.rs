@@ -20,10 +20,10 @@ fn parse_input(input: &str) -> u32 {
     let mut hash_map = HashMap::new();
 
     for line in map.lines() {
-        let (waypoint, decision) = line.split_once("=").unwrap();
+        let (waypoint, decision) = line.split_once('=').unwrap();
         let (left, right) = decision.split_once(',').unwrap();
-        let left = left.trim().replace(&['(', ')'], "");
-        let right = right.trim().replace(&['(', ')'], "");
+        let left = left.trim().replace(['(', ')'], "");
+        let right = right.trim().replace(['(', ')'], "");
 
         hash_map.insert(waypoint.trim(), (left, right));
     }

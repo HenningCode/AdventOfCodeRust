@@ -20,16 +20,17 @@ fn parse_input(input: &str) -> u32 {
     let mut hash_map = HashMap::new();
 
     for line in map.lines() {
-        let (waypoint, decision) = line.split_once("=").unwrap();
+        let (waypoint, decision) = line.split_once('=').unwrap();
         let (left, right) = decision.split_once(',').unwrap();
-        let left = left.trim().replace(&['(', ')'], "");
-        let right = right.trim().replace(&['(', ')'], "");
+        let left = left.trim().replace(['(', ')'], "");
+        let right = right.trim().replace(['(', ')'], "");
 
         hash_map.insert(waypoint.trim(), (left, right));
     }
+    
     let len = instructions_vec.len();
     let mut start_vec = Vec::new();
-    
+
     for key in hash_map.clone() {
         if key.0.ends_with('A') {
             start_vec.push(key.0)
@@ -37,7 +38,7 @@ fn parse_input(input: &str) -> u32 {
     }
 
     println!("{:?}", start_vec);
- 
+
     let (mut left_vec, mut right_vec) = (Vec::new(), Vec::new());
 
     for start_node in start_vec {
@@ -49,43 +50,37 @@ fn parse_input(input: &str) -> u32 {
     let mut finish = 0;
     let mut i = 0;
     loop {
-        let current_instruction = instructions_vec[i % len];     
-        // println!("C: {current_instruction}, VecR: {:?}, VecL: {:?}", right_vec, left_vec );
+        let current_instruction = instructions_vec[i % len];
 
         match current_instruction {
             'L' => {
                 for (i, value) in left_vec.clone().iter().enumerate() {
-                    
                     if value.ends_with('Z') {
                         finish += 1;
                     }
                     let (left, right) = hash_map.get(value.as_str()).unwrap().clone();
                     left_vec[i] = left;
-                    right_vec[i]= right;
+                    right_vec[i] = right;
                 }
-                // println!("I {current_instruction} Values Left: {:?}", left_vec);
             }
             'R' => {
                 for (i, value) in right_vec.clone().iter().enumerate() {
-                    
                     if value.ends_with('Z') {
                         finish += 1;
-                    } 
+                    }
                     let (left, right) = hash_map.get(value.as_str()).unwrap().clone();
                     left_vec[i] = left;
-                    right_vec[i]= right;
+                    right_vec[i] = right;
                 }
-                // println!("I {current_instruction} Values Right: {:?}", right_vec);
             }
             _ => panic!("Unknow instruction"),
         }
         i += 1;
 
-
         if finish == right_vec.len() {
             break;
         }
-        println!("{finish}");
+
         finish = 0;
     }
 
