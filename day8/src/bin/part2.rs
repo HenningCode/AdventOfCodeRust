@@ -6,7 +6,24 @@ fn main() {
     println!("{result}");
 }
 
-fn parse_input(input: &str) -> u32 {
+pub fn lcm(nums: &[usize]) -> usize {
+    if nums.len() == 1 {
+        return nums[0];
+    }
+    let a = nums[0];
+    let b = lcm(&nums[1..]);
+    a * b / gcd_of_two_numbers(a, b)
+}
+
+fn gcd_of_two_numbers(a: usize, b: usize) -> usize {
+    if b == 0 {
+        return a;
+    }
+    gcd_of_two_numbers(b, a % b)
+}
+
+
+fn parse_input(input: &str) -> usize {
     let (mut instructions, mut map) = ("", "");
 
     if let Some((temp1, temp2)) = input.split_once("\n\n") {
@@ -27,7 +44,7 @@ fn parse_input(input: &str) -> u32 {
 
         hash_map.insert(waypoint.trim(), (left, right));
     }
-    
+
     let len = instructions_vec.len();
     let mut start_vec = Vec::new();
 
@@ -37,54 +54,36 @@ fn parse_input(input: &str) -> u32 {
         }
     }
 
-    println!("{:?}", start_vec);
+    let mut iterations_vec = Vec::new();
 
-    let (mut left_vec, mut right_vec) = (Vec::new(), Vec::new());
-
-    for start_node in start_vec {
-        let (left, right) = hash_map.get(start_node).unwrap().clone();
-        left_vec.push(left);
-        right_vec.push(right);
+    for start in start_vec {
+        let mut i = 0;
+        let (mut left, mut right) = hash_map.get(start).unwrap().clone();
+        loop {
+            let current_instruction = instructions_vec[i % len];
+    
+            match current_instruction {
+                'L' => {
+                    if left.ends_with('Z') {
+                        break;
+                    }
+                    (left, right) = hash_map.get(left.as_str()).unwrap().clone();
+                }
+                'R' => {
+                    if right.ends_with('Z') {
+                        break;
+                    }
+                    (left, right) = hash_map.get(right.as_str()).unwrap().clone();
+                }
+                _ => panic!("Unknow instruction"),
+            }
+            i += 1;
+        }
+        
+        iterations_vec.push(i+1)
     }
 
-    let mut finish = 0;
-    let mut i = 0;
-    loop {
-        let current_instruction = instructions_vec[i % len];
-
-        match current_instruction {
-            'L' => {
-                for (i, value) in left_vec.clone().iter().enumerate() {
-                    if value.ends_with('Z') {
-                        finish += 1;
-                    }
-                    let (left, right) = hash_map.get(value.as_str()).unwrap().clone();
-                    left_vec[i] = left;
-                    right_vec[i] = right;
-                }
-            }
-            'R' => {
-                for (i, value) in right_vec.clone().iter().enumerate() {
-                    if value.ends_with('Z') {
-                        finish += 1;
-                    }
-                    let (left, right) = hash_map.get(value.as_str()).unwrap().clone();
-                    left_vec[i] = left;
-                    right_vec[i] = right;
-                }
-            }
-            _ => panic!("Unknow instruction"),
-        }
-        i += 1;
-
-        if finish == right_vec.len() {
-            break;
-        }
-
-        finish = 0;
-    }
-
-    i as u32
+    lcm(&iterations_vec)
 }
 
 #[cfg(test)]
