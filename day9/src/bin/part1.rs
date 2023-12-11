@@ -24,8 +24,8 @@ fn calc_rows(input: Vec<i64>) -> Vec<Vec<i64>> {
         for i in 0..current_row.len() - 1 {
             new_line.push(current_row[i + 1] - current_row[i])
         }
-        row_vec.push(new_line);
-        if row_vec.last().unwrap().iter().sum::<i64>() == 0 {
+        row_vec.push(new_line.clone());
+        if new_line.iter().all(|&x|x == 0) {
             break;
         }
     }
@@ -77,8 +77,8 @@ mod tests {
         let input = "0 3 6 9 12 15
 1 3 6 10 15 21
 10 13 16 21 30 45
-23 28 30 29 25 18 8 -5 -21 -40 -62 -87 -115 -146 -180 -217 -257 -300 -346 -395 -447";
+0 -1 -1 0";
 
-        assert_eq!(parse_input(input), 114);
+        assert_eq!(parse_input(input), 116);
     }
 }
