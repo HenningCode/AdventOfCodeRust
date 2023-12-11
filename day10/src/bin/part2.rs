@@ -6,17 +6,16 @@ fn main() {
     println!("{result}");
 }
 
-fn parse_input(input: &str) -> u32{
-
+fn parse_input(input: &str) -> u32 {
     4
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::*;
 
     #[test]
-    fn test_input(){
+    fn test_input() {
         let input = "";
         assert_eq!(parse_input(input), 288)
     }
