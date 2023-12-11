@@ -36,34 +36,35 @@ fn calc_continuation(row_matix: &mut Vec<Vec<i64>>) -> i64 {
     let mut first_row = true;
     let mut last_row: &mut Vec<i64> = &mut Vec::new();
     let mut result = 0;
-    
+
     for (i, row) in &mut row_matix.iter_mut().enumerate().rev() {
         if first_row {
             first_row = false;
+            (*row).push(0);
             last_row = row;
             continue;
         }
 
         if i == 0 {
             result = last_row.last().unwrap() + row.last().unwrap();
-        } else {
-            (*row).push(last_row.last().unwrap() + row.last().unwrap());
-            last_row = row;
         }
+        (*row).push(last_row.last().unwrap() + row.last().unwrap());
+        last_row = row;
     }
+    println!("{:?}", row_matix);
     result
 }
 
-fn parse_input(input: &str) -> i64 {
+fn parse_input(input: &str) -> i128 {
     let mut result = 0;
 
     for line in input.lines() {
         let nums = get_number_from_line(line);
         let mut rows = calc_rows(nums);
-        result += calc_continuation(&mut rows);
+        result += calc_continuation(&mut rows) as i128;
     }
 
-    result
+    result 
 }
 
 #[cfg(test)]
@@ -75,7 +76,8 @@ mod tests {
     fn test_input() {
         let input = "0 3 6 9 12 15
 1 3 6 10 15 21
-10 13 16 21 30 45";
+10 13 16 21 30 45
+23 28 30 29 25 18 8 -5 -21 -40 -62 -87 -115 -146 -180 -217 -257 -300 -346 -395 -447";
 
         assert_eq!(parse_input(input), 114);
     }
