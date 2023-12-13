@@ -2,11 +2,11 @@ use std::fs;
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("Not a valid filename");
-    let result = solve_part1(&input);
+    let result = solve_part2(&input, 1_000_000);
     println!("{result}");
 }
 
-fn manhattan_distance(x1: i32, x2: i32, y1: i32, y2: i32) -> i32 {
+fn manhattan_distance(x1: i64, x2: i64, y1: i64, y2: i64) -> i64 {
     (x1 - x2).abs() + (y1 - y2).abs()
 }
 
@@ -25,7 +25,16 @@ impl Universe {
             .map(|line| line.chars().collect::<Vec<char>>())
             .collect();
 
-        let galaxies = Vec::new();
+        let galaxies = map
+            .iter()
+            .enumerate()
+            .flat_map(|(y, line)| {
+                line.iter()
+                    .enumerate()
+                    .filter(|(_, c)| **c == '#')
+                    .map(move |(x, _)| Galaxy::new(x, y))
+            })
+            .collect::<Vec<_>>();
 
         let universe_length = map.len();
         let universe_width = map[0].len();
@@ -38,7 +47,7 @@ impl Universe {
         }
     }
 
-    fn expand_universe(&mut self) {
+    fn expand_universe(&mut self, mut expansion: u32) {
         let empty_rows = self
             .map
             .iter()
@@ -67,34 +76,26 @@ impl Universe {
             }
         }
 
+        expansion -= 1;
 
-        for (i, x) in empty_rows.clone().iter().enumerate() {
-            self.map.insert(x + i, vec!['.'; self.universe_width]);
-        }
-
-        self.universe_length += empty_rows.len();
-
-        for (i, y) in empty_cols.clone().iter().enumerate() {
-            for j in 0..self.universe_length {
-                self.map[j].insert(y + i, '.');
-                
+        for galaxy in self.galaxies.iter_mut() {
+            let mut num_smaller = 0;
+            for i in &empty_rows {
+                if *i > galaxy.y {
+                    break;
+                }
+                num_smaller += 1;
             }
+            galaxy.y += &((expansion * num_smaller) as usize);
+            num_smaller = 0;
+            for i in &empty_cols {
+                if *i > galaxy.x {
+                    break;
+                }
+                num_smaller += 1;
+            }
+            galaxy.x += &((expansion * num_smaller) as usize);
         }
-        self.universe_width += empty_cols.len();
-    }
-
-    fn get_galaxies(&mut self) {
-        self.galaxies = self
-            .map
-            .iter()
-            .enumerate()
-            .flat_map(|(y, line)| {
-                line.iter()
-                    .enumerate()
-                    .filter(|(_, c)| **c == '#')
-                    .map(move |(x, _)| Galaxy::new(x, y))
-            })
-            .collect::<Vec<_>>()
     }
 }
 
@@ -110,30 +111,21 @@ impl Galaxy {
     }
 }
 
-fn solve_part1(input: &str) -> i32 {
+fn solve_part2(input: &str, expansion: u32) -> i64 {
     let mut universe = Universe::new(input);
-    universe.expand_universe();
+    universe.expand_universe(expansion);
 
     let mut result = 0;
-
-    for i in &universe.map {
-        println!("{:?}", i);
-    }
-
-    universe.get_galaxies();
 
     for i in 0..universe.galaxies.len() {
         for j in i + 1..universe.galaxies.len() {
             let temp = manhattan_distance(
-                universe.galaxies[i].x as i32,
-                universe.galaxies[j].x as i32,
-                universe.galaxies[i].y as i32,
-                universe.galaxies[j].y as i32,
+                universe.galaxies[i].x as i64,
+                universe.galaxies[j].x as i64,
+                universe.galaxies[i].y as i64,
+                universe.galaxies[j].y as i64,
             );
-            // println!(
-            //     "Pair:{i}{j}, G:{:?},{:?} R:{temp}",
-            //     universe.galaxies[i], universe.galaxies[j]
-            // );
+
             result += temp;
         }
     }
@@ -158,6 +150,8 @@ mod tests {
 .......#..
 #...#.....";
 
-        assert_eq!(solve_part1(input), 374);
+        assert_eq!(solve_part2(input, 10), 1030);
+
+        assert_eq!(solve_part2(input, 100), 8410);
     }
 }
