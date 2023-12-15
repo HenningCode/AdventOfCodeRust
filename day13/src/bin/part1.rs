@@ -10,7 +10,7 @@ fn solve(input: &str) -> u64 {
     let mut data: Vec<Vec<String>> = Vec::new();
     let mut block: Vec<String> = Vec::new();
     for line in input.lines() {
-        if line == "" {
+        if line.is_empty() {
             data.push(block.clone());
             block.clear();
         } else {
@@ -21,15 +21,21 @@ fn solve(input: &str) -> u64 {
 
     let mut result = 0;
     for block in data {
-        let horizontal = check_horizontal_mirror(&block);
-        if horizontal.0 {
-            result += horizontal.1;
-        } else {
-            let vertical = check_vertical_mirror(&block);
-            if vertical.0 {
-                result += vertical.1 * 100;
-            } else {
-                panic!("Has to have a mirrow");
+        let mirror_horizontal = find_horizontal_mirror_lines(&block);
+        let mirror_vertical = find_vertical_mirror_lines(&block);
+
+        if !mirror_horizontal.is_empty() {
+            for mirror in mirror_horizontal {
+                if check_horizontal_mirror(&block, mirror) {
+                    result += mirror * 100;
+                }
+            }
+        }
+        if !mirror_vertical.is_empty() {
+            for mirror in mirror_vertical {
+                if check_vertical_mirror(&block, mirror) {
+                    result += mirror;
+                }
             }
         }
     }
@@ -37,55 +43,87 @@ fn solve(input: &str) -> u64 {
     result as u64
 }
 
-fn check_horizontal_mirror(input: &Vec<String>) -> (bool, i32) {
-    let mut split = -1;
+fn find_horizontal_mirror_lines(input: &Vec<String>) -> Vec<usize> {
+    let mut mirror_lines = Vec::new();
     for i in 1..input.len() {
         if input[i] == input[i - 1] {
-            split = i as i32;
+            mirror_lines.push(i);
         }
     }
 
-    if split == -1 {
-        return (false, split);
-    }
-
-    if input.len() as i32 - split > split {
-        for (i, j) in (0..split - 1).rev().enumerate() {
-            if input[j as usize] != input[(split as usize) + i + 1] {
-                return (false, split);
-            }
-        }
-    } else {
-        for (i, j) in (split + 1..(input.len() as i32)).enumerate() {
-            if input[j as usize] != input[(split as usize) - 2 - i] {
-                return (false, split);
-            }
-        }
-    }
-
-    (true, split + 1)
+    mirror_lines
 }
 
-fn check_vertical_mirror(input: &Vec<String>) -> (bool, i32) {
-    let mut split = -1;
-
+fn find_vertical_mirror_lines(input: &Vec<String>) -> Vec<usize> {
+    let mut mirror_lines = Vec::new();
     for i in 1..input[0].len() {
         let mut found = true;
-        for j in 0..input.len() {
-            if input[j].chars().nth(i) != input[j].chars().nth(i - 1) {
+        for line in input {
+            if line.chars().nth(i) != line.chars().nth(i - 1) {
                 found = false;
                 break;
             }
         }
 
         if found {
-            split = i as i32;
-            break;
+            mirror_lines.push(i);
         }
     }
-    println!("Found one possible");
+    mirror_lines
+}
 
-    (true, split)
+fn check_horizontal_mirror(input: &Vec<String>, mirror_line: usize) -> bool {
+    if input.len() - mirror_line > mirror_line {
+        for (i, j) in (0..mirror_line - 1).rev().enumerate() {
+            if input[j] != input[mirror_line + i + 1] {
+                return false;
+            }
+        }
+    } else {
+        for (i, j) in (mirror_line + 1..input.len()).enumerate() {
+            if input[j] != input[mirror_line - 2 - i] {
+                return false;
+            }
+        }
+    }
+
+    true
+}
+
+fn check_vertical_mirror(input: &Vec<String>, mirror_line: usize) -> bool {
+    if input[0].len() - mirror_line > mirror_line {
+        let mut equal = true;
+        for (i, j) in (0..mirror_line - 1).rev().enumerate() {
+            for line in input {
+                if line.chars().nth(j)
+                    != line.chars().nth((mirror_line) + i + 1)
+                {
+                    equal = false;
+                    break;
+                }
+            }
+            if !equal {
+                break;
+            }
+        }
+        equal
+    } else {
+        let mut equal = true;
+        for (i, j) in (mirror_line + 1..input[0].len()).enumerate() {
+            for line in input {
+                if line.chars().nth(j)
+                    != line.chars().nth((mirror_line) - 2 - i)
+                {
+                    equal = false;
+                    break;
+                }
+            }
+            if !equal {
+                break;
+            }
+        }
+        equal
+    }
 }
 
 #[cfg(test)]
@@ -111,5 +149,22 @@ mod tests {
 #....#..#";
 
         assert_eq!(solve(input), 405);
+    }
+
+    #[test]
+    fn failed_test() {
+        let input = "##.#.....
+##.#.....
+#......##
+..#......
+..##...##
+.#.###.##
+.##.##..#
+###.#####
+###.#####
+.##.##..#
+.#.#.#.##
+..##...##";
+        assert_eq!(solve(input), 7);
     }
 }
