@@ -92,37 +92,28 @@ fn check_horizontal_mirror(input: &Vec<String>, mirror_line: usize) -> bool {
 
 fn check_vertical_mirror(input: &Vec<String>, mirror_line: usize) -> bool {
     if input[0].len() - mirror_line > mirror_line {
-        let mut equal = true;
         for (i, j) in (0..mirror_line - 1).rev().enumerate() {
             for line in input {
                 if line.chars().nth(j)
                     != line.chars().nth((mirror_line) + i + 1)
                 {
-                    equal = false;
-                    break;
+                    return false;
                 }
             }
-            if !equal {
-                break;
-            }
+
         }
-        equal
+        true
     } else {
-        let mut equal = true;
         for (i, j) in (mirror_line + 1..input[0].len()).enumerate() {
             for line in input {
                 if line.chars().nth(j)
                     != line.chars().nth((mirror_line) - 2 - i)
                 {
-                    equal = false;
-                    break;
+                    return false;
                 }
             }
-            if !equal {
-                break;
-            }
         }
-        equal
+        true
     }
 }
 
