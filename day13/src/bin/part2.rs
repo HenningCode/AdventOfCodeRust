@@ -56,9 +56,7 @@ fn solve(input: &str) -> u64 {
 
                 if right_line < block[0].len() {
                     for char in block.clone() {
-                        if char.chars().nth(right_line)
-                            != char.chars().nth(left_line)
-                        {
+                        if char.chars().nth(right_line) != char.chars().nth(left_line) {
                             smudges += 1;
                         }
                     }
