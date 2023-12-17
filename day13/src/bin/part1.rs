@@ -94,21 +94,16 @@ fn check_vertical_mirror(input: &Vec<String>, mirror_line: usize) -> bool {
     if input[0].len() - mirror_line > mirror_line {
         for (i, j) in (0..mirror_line - 1).rev().enumerate() {
             for line in input {
-                if line.chars().nth(j)
-                    != line.chars().nth((mirror_line) + i + 1)
-                {
+                if line.chars().nth(j) != line.chars().nth((mirror_line) + i + 1) {
                     return false;
                 }
             }
-
         }
         true
     } else {
         for (i, j) in (mirror_line + 1..input[0].len()).enumerate() {
             for line in input {
-                if line.chars().nth(j)
-                    != line.chars().nth((mirror_line) - 2 - i)
-                {
+                if line.chars().nth(j) != line.chars().nth((mirror_line) - 2 - i) {
                     return false;
                 }
             }

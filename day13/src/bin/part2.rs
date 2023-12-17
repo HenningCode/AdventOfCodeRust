@@ -21,18 +21,20 @@ fn solve(input: &str) -> u64 {
     let allowed_smudges = 1;
     let mut result = 0;
 
-    for block in data {  
+    for block in data {
         // Horizontal Lines
         for line_index in 1..block.len() {
-            let mut smudges = 0;   
-            println!("{line_index}");
+            let mut smudges = 0;
+            // println!("{line_index}");
             for it in 0..line_index {
                 let bottom_line = line_index - 1 - it;
                 let top_line = line_index + it;
 
-                if top_line < block.len(){
+                if top_line < block.len() {
                     for char_index in 0..block[line_index].len() {
-                        if block[top_line].chars().nth(char_index) != block[bottom_line].chars().nth(char_index){
+                        if block[top_line].chars().nth(char_index)
+                            != block[bottom_line].chars().nth(char_index)
+                        {
                             smudges += 1;
                         }
                     }
@@ -40,17 +42,36 @@ fn solve(input: &str) -> u64 {
             }
             if smudges == allowed_smudges {
                 result += 100 * line_index;
-            }   
-        }  
+            }
+        }
 
-        // Vertical Lines 
+        // Vertical Lines
 
-              
+        for line_index in 1..block[0].len() {
+            let mut smudges = 0;
+            // println!("{line_index}");
+            for it in 0..line_index {
+                let left_line = line_index - 1 - it;
+                let right_line = line_index + it;
+
+                if right_line < block[0].len() {
+                    for char in block.clone() {
+                        if char.chars().nth(right_line)
+                            != char.chars().nth(left_line)
+                        {
+                            smudges += 1;
+                        }
+                    }
+                }
+            }
+            if smudges == allowed_smudges {
+                result += line_index;
+            }
+        }
     }
 
     result as u64
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -74,7 +95,7 @@ mod tests {
 ..##..###
 #....#..#";
 
-        assert_eq!(solve(input), 405);
+        assert_eq!(solve(input), 400);
     }
 
     #[test]
